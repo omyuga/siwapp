@@ -1,12 +1,21 @@
 class SettingsController < ApplicationController
   # Global configuration settings
   def global
+    @global_settings_form = GlobalSettingsForm.new params[:global_settings_form]
     if request.post?
-      [:company_name, :company_vat_id, :company_address, :company_phone, :company_url, :legal_terms, :days_to_due, :company_email].each do |key|
-        Settings[key] = params[key]
+      if @global_settings_form.valid?
+        Settings.company_name = @global_settings_form.company_name
+        Settings.company_vat_id = @global_settings_form.company_vat_id
+        Settings.company_address = @global_settings_form.company_address
+        Settings.company_phone = @global_settings_form.company_phone
+        Settings.company_logo = @global_settings_form.company_logo
+        Settings.company_email = @global_settings_form.company_email
+      else
+        flash.now[:error] = @global_settings_form.errors.messages
       end
-      Settings.company_logo = params[:company_logo].gsub('https://', 'http://')
-      Settings.currency = params[:currency][:id]
+      
+      # Settings.company_logo = params[:company_logo].gsub('https://', 'http://')
+      # Settings.currency = params[:currency][:id]
       redirect_to action: :global
     end
 
